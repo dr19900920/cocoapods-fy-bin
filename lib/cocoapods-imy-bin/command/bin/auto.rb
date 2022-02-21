@@ -40,7 +40,7 @@ module Pod
           @zip = argv.flag?('zip', true)
           @all_make = argv.flag?('all-make', false )
           @verbose = argv.flag?('verbose',true)
-          @archs = argv.flag?('archs','armv7,arm64')
+          @archs = argv.flag?('archs','arm64')
           @config = argv.option('configuration', 'Debug')
           @additional_args = argv.remainder!
 
@@ -95,7 +95,7 @@ module Pod
 
         def run_archive
           argvs = [
-              "--sources=#{sources_option(@code_dependencies, @sources)},https:\/\/cdn.cocoapods.org",
+              "--sources=#{sources_option(@code_dependencies, @sources)}",
               @additional_args
           ]
 

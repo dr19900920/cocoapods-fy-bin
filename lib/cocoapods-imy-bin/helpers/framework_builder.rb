@@ -223,10 +223,12 @@ module CBin
 
         #by slj 如果没有头文件，去 "Headers/Public"拿
         # if public_headers.empty?
-        spec_header_dir = "./Headers/Public/#{@spec.name}"
-        unless File.exist?(spec_header_dir)
-          spec_header_dir = "./Pods/Headers/Public/#{@spec.name}"
-        end
+        # spec_header_dir = "./Headers/Public/#{@spec.name}"
+        # unless File.exist?(spec_header_dir)
+        #   spec_header_dir = "./Pods/Headers/Public/#{@spec.name}"
+        # end
+        arch = ios_architectures[0]
+        spec_header_dir = "./build-#{arch}/#{@spec.name}.framework/Headers"
         raise "copy_headers #{spec_header_dir} no exist " unless File.exist?(spec_header_dir)
         Dir.chdir(spec_header_dir) do
           headers = Dir.glob('*.h')
