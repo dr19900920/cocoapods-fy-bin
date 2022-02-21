@@ -68,7 +68,7 @@ EOF
         argvs = [
             "#{binary_podsepc_json}",
             "--binary",
-            "--sources=#{sources_option(@code_dependencies, @sources)},https:\/\/cdn.cocoapods.org",
+            "--sources=#{sources_option(@code_dependencies, @sources)}",
             "--skip-import-validation",
             "--use-libraries",
             "--allow-warnings",

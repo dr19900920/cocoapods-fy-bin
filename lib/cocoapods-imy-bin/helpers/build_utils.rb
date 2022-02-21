@@ -7,11 +7,11 @@ module CBin
     class Utils
 
       def Utils.is_framework(spec)
-        if Utils.uses_frameworks?
+        # if Utils.uses_frameworks?
           return true
-        end
-
-        return Utils.is_swift_module(spec)
+        # end
+        #
+        # return Utils.is_swift_module(spec)
       end
 
       def Utils.is_swift_module(spec)

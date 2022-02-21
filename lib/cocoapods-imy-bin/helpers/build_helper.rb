@@ -40,13 +40,12 @@ module CBin
 
           build_static_framework
           unless @skip_archive
-            # unless  CBin::Build::Utils.is_framework(@spec)
-            #   build_static_library
-            #   zip_static_library
-            # else
-            # 只支持framework
+            unless  CBin::Build::Utils.is_framework(@spec)
+              build_static_library
+              zip_static_library
+            else
               zip_static_framework
-            # end
+            end
           end
 
         end
