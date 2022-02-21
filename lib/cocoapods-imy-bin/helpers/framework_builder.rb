@@ -32,7 +32,7 @@ module CBin
 
       def build
         defines = compile
-        build_sim_libraries(defines)
+        # build_sim_libraries(defines)
 
         defines
       end
@@ -96,19 +96,23 @@ module CBin
           ios_architectures.map do |arch|
             static_libs += static_libs_in_sandbox("build-#{arch}") + @vendored_libraries
           end
-          ios_architectures_sim do |arch|
-            static_libs += static_libs_in_sandbox("build-#{arch}") + @vendored_libraries
-          end
+          # ios_architectures_sim do |arch|
+          #   static_libs += static_libs_in_sandbox("build-#{arch}") + @vendored_libraries
+          # end
         # end
 
         build_path = Pathname("build")
         build_path.mkpath unless build_path.exist?
 
         # if is_debug_model
-          libs = (ios_architectures + ios_architectures_sim) .map do |arch|
-            library = "build-#{arch}/lib#{target_name}.a"
-            library
-          end
+        #   libs = (ios_architectures + ios_architectures_sim) .map do |arch|
+        #     library = "build-#{arch}/#{@spec.name}.framework/#{@spec.name}"
+        #     library
+        #   end
+        libs = (ios_architectures) .map do |arch|
+          library = "build-#{arch}/#{@spec.name}.framework/#{@spec.name}"
+          library
+        end
         # else
         #   libs = ios_architectures.map do |arch|
         #     library = "build/package-#{@spec.name}-#{arch}.a"
