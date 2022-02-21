@@ -10,13 +10,14 @@ module CBin
     class Builder
       include Pod
 #Debug下还待完成
-      def initialize(spec, file_accessor, platform, source_dir, isRootSpec = true, build_model="Debug")
+      def initialize(spec, file_accessor, platform, source_dir, archs, isRootSpec = true, build_model="Debug")
         @spec = spec
         @source_dir = source_dir
         @file_accessor = file_accessor
         @platform = platform
         @build_model = build_model
         @isRootSpec = isRootSpec
+        @archs = archs
         #vendored_static_frameworks 只有 xx.framework  需要拼接为 xx.framework/xx by slj
         vendored_static_frameworks = file_accessor.vendored_static_frameworks.map do |framework|
           path = framework
@@ -145,11 +146,12 @@ module CBin
         #   iphone5,iphone5s以下的模拟器
         # >x86_64
         #   iphone6以上的模拟器
-        archs = %w[arm64 armv7]
+        # archs = %w[arm64 armv7]
         # archs = %w[x86_64 arm64 armv7s i386]
         # @vendored_libraries.each do |library|
         #   archs = `lipo -info #{library}`.split & archs
         # end
+        archs = @archs.split(",")
         archs
       end
 

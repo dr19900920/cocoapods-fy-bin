@@ -30,7 +30,8 @@ module Pod
               ['--framework-output', '输出framework文件'],
               ['--no-zip', '不压缩静态库 为 zip'],
               ['--configuration', 'Build the specified configuration (e.g. Debug). Defaults to Release'],
-              ['--env', "该组件上传的环境 %w[dev debug_iphoneos release_iphoneos]"]
+              ['--env', "该组件上传的环境 %w[dev debug_iphoneos release_iphoneos]"],
+              ['--archs', "需要二进制组件的架构"]
           ].concat(Pod::Command::Gen.options).concat(super).uniq
         end
 
@@ -51,7 +52,7 @@ module Pod
           @all_make = argv.flag?('all-make', false )
           @sources = argv.option('sources') || []
           @platform = Platform.new(:ios)
-
+          @archs = argv.option('archs', 'armv7,arm64')
           @config = argv.option('configuration', 'Release')
 
           @framework_path
@@ -84,6 +85,7 @@ module Pod
                                             @framework_output,
                                             @zip,
                                             @spec,
+                                            @archs,
                                             CBin::Config::Builder.instance.white_pod_list.include?(@spec.name),
                                             @config)
           builder.build

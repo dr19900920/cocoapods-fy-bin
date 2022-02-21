@@ -19,6 +19,7 @@ module CBin
                      framework_output,
                      zip,
                      rootSpec,
+                     archs,
                      skip_archive = false,
                      build_model="Release")
         @spec = spec
@@ -26,6 +27,7 @@ module CBin
         @build_model = build_model
         @rootSpec = rootSpec
         @isRootSpec = rootSpec.name == spec.name
+        @archs = archs
         @skip_archive = skip_archive
         @framework_output = framework_output
         @zip = zip
@@ -54,7 +56,7 @@ module CBin
         source_dir = Dir.pwd
         file_accessor = Sandbox::FileAccessor.new(Pathname.new('.').expand_path, @spec.consumer(@platform))
         Dir.chdir(workspace_directory) do
-          builder = CBin::Framework::Builder.new(@spec, file_accessor, @platform, source_dir, @isRootSpec, @build_model )
+          builder = CBin::Framework::Builder.new(@spec, file_accessor, @platform, source_dir, @archs, @isRootSpec, @build_model)
           @@build_defines = builder.build if @isRootSpec
           begin
             @framework_path = builder.lipo_build(@@build_defines) unless @skip_archive
@@ -68,7 +70,7 @@ module CBin
         source_dir = zip_dir
         file_accessor = Sandbox::FileAccessor.new(Pathname.new('.').expand_path, @spec.consumer(@platform))
         Dir.chdir(workspace_directory) do
-          builder = CBin::Library::Builder.new(@spec, file_accessor, @platform, source_dir,@framework_path)
+          builder = CBin::Library::Builder.new(@spec, file_accessor, @platform, source_dir , @archs, @framework_path)
           builder.build
         end
       end
