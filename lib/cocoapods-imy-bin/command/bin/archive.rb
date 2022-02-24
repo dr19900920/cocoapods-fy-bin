@@ -68,8 +68,9 @@ module Pod
           FileUtils.rm_rf(zip_dir) if File.exist?(zip_dir)
 
           @spec = Specification.from_file(spec_file)
+          # 生成pod project
           generate_project
-
+          # 编译打包framwwork
           build_root_spec
 
           sources_sepc = Array.new
@@ -169,6 +170,9 @@ module Pod
 
                 gen = Pod::Command::Gen.new(CLAide::ARGV.new(argvs))
                 gen.validate!
+                # 1 通过create_app_project（cocoapods-generate=》xcodeproj）创建.xcodeproj文件
+                # 2 创建CocoaPods.podfile.yaml 工作空间.xcworkspace描述文件
+                # 3 根据yaml里面podspec路径和插件中HooksManager::source_provider更新依赖等信息 生成工程文件
                 gen.run
             end
           end

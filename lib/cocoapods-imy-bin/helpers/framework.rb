@@ -16,11 +16,14 @@ module CBin
     end
 
     def make
+      # 创建平台根目录
       make_root
+      # 创建framework目录树
       make_framework
+      # 创建headers 目录
       make_headers
       make_resources
-      make_current_version
+      # make_current_version
     end
 
     def delete_resources
@@ -61,19 +64,22 @@ module CBin
       @fwk_path.mkdir unless @fwk_path.exist?
 
       @module_map_path = @fwk_path + Pathname.new('Modules')
+      @module_map_path.mkdir unless @module_map_path.exist?
       @swift_module_path = @module_map_path + Pathname.new(@name + '.swiftmodule')
+      @swift_module_path.mkdir unless  @swift_module_path.exist?
 
-
-      @versions_path = @fwk_path + Pathname.new('Versions/A')
+      # @versions_path = @fwk_path + Pathname.new('Versions/A')
     end
 
     def make_headers
-      @headers_path = @versions_path + Pathname.new('Headers')
+      # @headers_path = @versions_path + Pathname.new('Headers')
+      @headers_path = @fwk_path + Pathname.new('Headers')
       @headers_path.mkpath unless @headers_path.exist?
     end
 
     def make_resources
-      @resources_path = @versions_path + Pathname.new('Resources')
+      # @resources_path = @fwk_path + Pathname.new('Resources')
+      @resources_path = @fwk_path
       @resources_path.mkpath unless @resources_path.exist?
     end
 
