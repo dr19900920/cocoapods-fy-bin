@@ -124,9 +124,13 @@ module CBin
         #     library
         #   end
         # end
-
-        UI.message "lipo -create -output #{output} #{libs.join(' ')}"
-        `lipo -create -output #{output} #{libs.join(' ')}`
+        if libs.length == 1
+          UI.message "cp #{libs[0]} #{output}"
+          `cp #{libs[0]} #{output}`
+        else
+          UI.message "lipo -create -output #{output} #{libs.join(' ')}"
+          `lipo -create -output #{output} #{libs.join(' ')}`
+        end
       end
 
       def ios_build_options
@@ -367,6 +371,10 @@ module CBin
         end
       end
 
+      def framework_name
+        framework_name = @spec.name.sub('-', '_')
+        framework_name
+      end
 
     end
   end
