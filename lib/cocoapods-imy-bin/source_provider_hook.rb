@@ -12,6 +12,7 @@ Pod::HooksManager.register('cocoapods-imy-bin', :pre_install) do |_context, _|
   if _context.podfile.plugins.keys.include?('cocoapods-imy-bin') && _context.podfile.configuration_env == 'dev'
     dependencies = _context.podfile.dependencies
     dependencies.each do |d|
+      # 组件存在external_source，并且external_source有值 并且external_source path不为空 且不为archive状态时 设置组件加载路径
       next unless d.respond_to?(:external_source) &&
                   d.external_source.is_a?(Hash) &&
                   !d.external_source[:path].nil? &&
