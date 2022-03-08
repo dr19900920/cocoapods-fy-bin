@@ -6,6 +6,68 @@ require 'cocoapods-imy-bin/native/pod_source_installer'
 
 module Pod
   class Installer
+    attr_reader :removed_frameworks
+    attr_reader :clean_white_list
+
+    def cache_descriptors
+      @cache_descriptors ||= begin
+                               cache = Downloader::Cache.new(Config.instance.cache_root + 'Pods')
+                               cache_descriptors = cache.cache_descriptors_per_pod
+                             end
+    end
+    # 清除项目中不使用二进制的二进制库 工程目录/Pods/组件名称
+    def clean_local_cache
+      @removed_frameworks = Array.new
+      title_options = { verbose_prefix: '-> '.red }
+
+      podfile = Pod::Config.instance.podfile
+      root_specs.sort_by(&:name).each do |spec|
+        pod_dir = Pod::Config.instance.sandbox.pod_dir(spec.root.name)
+        framework_file = pod_dir + "#{spec.root.name}.framework"
+        # 如果framework存在 但不使用二进制 则删除framework
+        if pod_dir.exist? && framework_file.exist? && !podfile.use_binaries_selector.call(spec) && !clean_white_list.include?(spec.root.name)
+          title = "Remove Binary Framework #{spec.name} #{spec.version}"
+          UI.titled_section(title.red, title_options) do
+            @removed_frameworks << spec.root.name
+            begin
+              FileUtils.rm_rf(pod_dir)
+            rescue => err
+              puts err
+            end
+          end
+        end
+      end
+    end
+
+    # 清除本地资源 /Users/dengrui/Library/Caches/CocoaPods/Pods/Release/
+    def clean_pod_cache
+      clean_white_list = ['Bugly', 'LookinServer']
+      podfile = Pod::Config.instance.podfile
+      root_specs.sort_by(&:name).each do |spec|
+        descriptors = cache_descriptors[spec.root.name]
+        if !descriptors.nil?
+          descriptors = descriptors.select { |d| d[:version] == spec.version}
+          descriptors.each do |d|
+            # pod cache 文件名由文件内容的 sha1 组成，由于生成时使用的是 podspec，获取时使用的是 podspec.json 导致生成的目录名不一致
+            # Downloader::Request slug
+            # cache_descriptors_per_pod 表明，specs_dir 中都是以 .json 形式保存 spec
+            slug = d[:slug].dirname + "#{spec.version}-#{spec.checksum[0, 5]}"
+            puts slug
+            framework_file = slug + "#{spec.root.name}.framework"
+            puts framework_file
+            if framework_file.exist? && !podfile.use_binaries_selector.call(spec) && !clean_white_list.include?(spec.root.name)
+              begin
+                FileUtils.rm(d[:spec_file])
+                FileUtils.rm_rf(slug)
+              rescue => err
+                puts err
+              end
+            end
+          end
+        end
+      end
+    end
+
     alias old_create_pod_installer create_pod_installer
     def create_pod_installer(pod_name)
       installer = old_create_pod_installer(pod_name)
@@ -15,6 +77,10 @@ module Pod
 
     alias old_install_pod_sources install_pod_sources
     def install_pod_sources
+      @clean_white_list = ['Bugly', 'LookinServer']
+      clean_local_cache
+      clean_pod_cache
+
       if installation_options.install_with_multi_threads
         if Pod.match_version?('~> 1.4.0')
           install_pod_sources_for_version_in_1_4_0
@@ -54,8 +120,9 @@ module Pod
 
     def install_pod_sources_for_version_above_1_5_0
       @installed_specs = []
-      pods_to_install = sandbox_state.added | sandbox_state.changed
+      pods_to_install = sandbox_state.added | sandbox_state.changed | removed_frameworks
       title_options = { verbose_prefix: '-> '.green }
+      puts pods_to_install
       # 多进程下载，多线程时 log 会显著交叉，多进程好点，但是多进程需要利用文件锁对 cache 进行保护
       # in_processes: 10
       Parallel.each(root_specs.sort_by(&:name), in_threads: 4) do |spec|
