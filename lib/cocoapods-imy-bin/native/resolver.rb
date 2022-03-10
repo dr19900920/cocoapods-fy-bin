@@ -10,6 +10,7 @@ require 'cocoapods-imy-bin/command/bin/archive'
 
 module Pod
   class Resolver
+
     if Pod.match_version?('~> 1.6')
       # 其实不用到 resolver_specs_by_target 再改 spec
       # 在这个方法里面，通过修改 dependency 的 source 应该也可以
@@ -21,9 +22,6 @@ module Pod
         sources_manager = Config.instance.sources_manager
         if dependency&.podspec_repo
           sources_manager.aggregate_for_dependency(dependency)
-          # 采用 lock 中的 source ，会导致插件对 source 的先后调整失效
-          # elsif (locked_vertex = @locked_dependencies.vertex_named(dependency.name)) && (locked_dependency = locked_vertex.payload) && locked_dependency.podspec_repo
-          #   sources_manager.aggregate_for_dependency(locked_dependency)
         else
           @aggregate ||= Source::Aggregate.new(sources)
         end
@@ -67,6 +65,17 @@ module Pod
 
         old_valid_possibility_version_for_root_name?(requirement, activated, spec)
       end
+
+      alias old_requirement_satisfied_by? requirement_satisfied_by?
+      def requirement_satisfied_by?(requirement, activated, spec)
+        podfile = Pod::Config.instance.podfile
+        # 没有了二进制 过滤掉对应二进制源
+        if !podfile.use_binaries_selector.call(spec) && spec.spec_source.url == @sources_manager.binary_source.url
+          return false
+        end
+        old_requirement_satisfied_by?(requirement, activated, spec)
+      end
+
     elsif Pod.match_version?('~> 1.4')
       def requirement_satisfied_by?(requirement, activated, spec)
         version = spec.version
@@ -124,7 +133,6 @@ module Pod
             # 采用二进制依赖并且不为开发组件
             use_binary = use_binary_rspecs.include?(rspec)
             source = use_binary ? sources_manager.binary_source : sources_manager.code_source
-
             spec_version = rspec.spec.version
             UI.message 'cocoapods-imy-bin 插件'
             UI.message "- 开始处理 #{rspec.spec.name} #{spec_version} 组件."
