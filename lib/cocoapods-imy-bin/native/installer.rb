@@ -23,7 +23,7 @@ module Pod
         pod_dir = Pod::Config.instance.sandbox.pod_dir(spec.root.name)
         framework_file = pod_dir + "#{spec.root.name}.framework"
         # 如果framework存在 但不使用二进制 则删除framework
-        if pod_dir.exist? && framework_file.exist? && !podfile.use_binaries_selector.call(spec) && !clean_white_list.include?(spec.root.name)
+        if pod_dir.exist? && framework_file.exist? && (podfile.use_binaries_selector.nil? || !podfile.use_binaries_selector.call(spec)) && !clean_white_list.include?(spec.root.name)
           title = "Remove Binary Framework #{spec.name} #{spec.version}"
           UI.titled_section(title.red, title_options) do
             @removed_frameworks << spec.root.name
@@ -53,7 +53,7 @@ module Pod
             puts slug
             framework_file = slug + "#{spec.root.name}.framework"
             puts framework_file
-            if framework_file.exist? && !podfile.use_binaries_selector.call(spec) && !clean_white_list.include?(spec.root.name)
+            if framework_file.exist? && (podfile.use_binaries_selector.nil? || !podfile.use_binaries_selector.call(spec)) && !clean_white_list.include?(spec.root.name)
               begin
                 FileUtils.rm(d[:spec_file])
                 FileUtils.rm_rf(slug)

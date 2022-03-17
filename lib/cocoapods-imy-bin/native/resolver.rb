@@ -69,9 +69,8 @@ module Pod
       alias old_requirement_satisfied_by? requirement_satisfied_by?
       def requirement_satisfied_by?(requirement, activated, spec)
         podfile = Pod::Config.instance.podfile
-        # 如果没有全局使用二进制 则进入局部二进制判断
-        # 没有了二进制 过滤掉对应二进制源
-        if !podfile.use_binaries_selector.call(spec) && spec.spec_source.url == @sources_manager.binary_source.url && !podfile.use_binaries?
+        # 如果没有使用全局二进制字段 则进入局部二进制判断
+        if !podfile.use_binaries_selector.nil? && !podfile.use_binaries_selector.call(spec) && spec.spec_source.url == @sources_manager.binary_source.url && !podfile.use_binaries?
           return false
         end
         old_requirement_satisfied_by?(requirement, activated, spec)
