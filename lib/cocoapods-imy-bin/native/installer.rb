@@ -17,10 +17,8 @@ module Pod
     end
     # 清除项目中不使用二进制的二进制库 工程目录/Pods/组件名称
     def clean_local_cache
-      @removed_frameworks = Array.new
-      title_options = { verbose_prefix: '-> '.red }
-
       podfile = Pod::Config.instance.podfile
+      title_options = { verbose_prefix: '-> '.red }
       root_specs.sort_by(&:name).each do |spec|
         pod_dir = Pod::Config.instance.sandbox.pod_dir(spec.root.name)
         framework_file = pod_dir + "#{spec.root.name}.framework"
@@ -78,8 +76,13 @@ module Pod
     alias old_install_pod_sources install_pod_sources
     def install_pod_sources
       @clean_white_list = ['Bugly', 'LookinServer']
-      clean_local_cache
-      clean_pod_cache
+      @removed_frameworks = Array.new
+      podfile = Pod::Config.instance.podfile
+      # 如果不是全局使用 则删除不在列表内的framework二进制缓存
+      if !podfile.use_binaries?
+        clean_local_cache
+        clean_pod_cache
+      end
 
       if installation_options.install_with_multi_threads
         if Pod.match_version?('~> 1.4.0')
@@ -122,7 +125,6 @@ module Pod
       @installed_specs = []
       pods_to_install = sandbox_state.added | sandbox_state.changed | removed_frameworks
       title_options = { verbose_prefix: '-> '.green }
-      puts pods_to_install
       # 多进程下载，多线程时 log 会显著交叉，多进程好点，但是多进程需要利用文件锁对 cache 进行保护
       # in_processes: 10
       Parallel.each(root_specs.sort_by(&:name), in_threads: 4) do |spec|
