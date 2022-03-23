@@ -43,8 +43,7 @@ module CBin
           # defines = compile
 
           # build_sim_libraries(defines)
-          # output = framework.versions_path + Pathname.new(@spec.name)
-          output = framework.fwk_path + Pathname.new(@spec.name)
+          output = framework.fwk_path + Pathname.new(treated_framework_name)
           build_static_library_for_ios(output)
 
           copy_headers
@@ -59,14 +58,13 @@ module CBin
       private
 
       def cp_to_source_dir
-        framework_name = "#{@spec.name}.framework"
-        target_dir = File.join(CBin::Config::Builder.instance.zip_dir,framework_name)
+        target_dir = File.join(CBin::Config::Builder.instance.zip_dir,treated_framework_name)
         FileUtils.rm_rf(target_dir) if File.exist?(target_dir)
 
         zip_dir = CBin::Config::Builder.instance.zip_dir
         FileUtils.mkdir_p(zip_dir) unless File.exist?(zip_dir)
 
-        `cp -fa #{@platform}/#{framework_name} #{target_dir}`
+        `cp -fa #{@platform}/#{treated_framework_name} #{target_dir}`
       end
 
       #模拟器，目前只支持 debug x86-64
@@ -111,7 +109,7 @@ module CBin
         #     library
         #   end
         libs = (ios_architectures) .map do |arch|
-          library = "build-#{arch}/#{@spec.name}.framework/#{@spec.name}"
+          library = "build-#{arch}/#{treated_framework_name}.framework/#{treated_framework_name}"
           library
         end
         # else
@@ -225,15 +223,8 @@ module CBin
       def copy_headers
         #走 podsepc中的public_headers
         public_headers = Array.new
-
-        #by slj 如果没有头文件，去 "Headers/Public"拿
-        # if public_headers.empty?
-        # spec_header_dir = "./Headers/Public/#{@spec.name}"
-        # unless File.exist?(spec_header_dir)
-        #   spec_header_dir = "./Pods/Headers/Public/#{@spec.name}"
-        # end
         arch = ios_architectures[0]
-        spec_header_dir = "./build-#{arch}/#{@spec.name}.framework/Headers"
+        spec_header_dir = "./build-#{arch}/#{treated_framework_name}.framework/Headers"
         raise "copy_headers #{spec_header_dir} no exist " unless File.exist?(spec_header_dir)
         Dir.chdir(spec_header_dir) do
           headers = Dir.glob('*.h')
@@ -252,7 +243,7 @@ module CBin
         # If custom 'module_map' is specified add it to the framework distribution
         # otherwise check if a header exists that is equal to 'spec.name', if so
         # create a default 'module_map' one using it.
-        module_map_dir = "./build-#{arch}/#{@spec.name}.framework/Modules/module.modulemap"
+        module_map_dir = "./build-#{arch}/#{treated_framework_name}.framework/Modules/module.modulemap"
         if !@spec.module_map.nil?
           module_map_file = @file_accessor.module_map
           if Pathname(module_map_file).exist?
@@ -261,10 +252,10 @@ module CBin
         elsif File.exist?(module_map_dir)
           module_map_path = Pathname.new(module_map_dir)
           module_map = File.read(module_map_path)
-        elsif public_headers.map(&:basename).map(&:to_s).include?("#{@spec.name}.h")
+        elsif public_headers.map(&:basename).map(&:to_s).include?("#{treated_framework_name}.h")
           module_map = <<-MAP
-          framework module #{@spec.name} {
-            umbrella header "#{@spec.name}.h"
+          framework module #{treated_framework_name} {
+            umbrella header "#{treated_framework_name}.h"
 
             export *
             module * { export * }
@@ -281,7 +272,7 @@ module CBin
         end
 
         #swift module
-        swift_module_map_dir = "./build-#{arch}/#{@spec.name}.framework/Modules/#{@spec.name}.swiftmodule"
+        swift_module_map_dir = "./build-#{arch}/#{treated_framework_name}.framework/Modules/#{treated_framework_name}.swiftmodule"
         if File.exist?(swift_module_map_dir)
           `ditto #{swift_module_map_dir} #{framework.swift_module_path}`
         end
@@ -297,7 +288,7 @@ module CBin
         UI.message 'Copying info.plist'
         info_plist_dir = './build-armv7' if File.exist?('./build-armv7')
         info_plist_dir = './build-arm64' if File.exist?('./build-arm64')
-        info_plist_file = "#{info_plist_dir}/#{@spec.name}.framework/Info.plist"
+        info_plist_file = "#{info_plist_dir}/#{treated_framework_name}.framework/Info.plist"
         `cp "#{info_plist_file}" #{framework.fwk_path}` if Pathname(info_plist_file).exist?
       end
 
@@ -329,9 +320,9 @@ module CBin
         
         real_source_dir = @source_dir
         unless @isRootSpec
-          spec_source_dir = File.join(Dir.pwd,"#{@spec.name}")
+          spec_source_dir = File.join(Dir.pwd,"#{treated_framework_name}")
           unless File.exist?(spec_source_dir)
-            spec_source_dir = File.join(Dir.pwd,"Pods/#{@spec.name}")
+            spec_source_dir = File.join(Dir.pwd,"Pods/#{treated_framework_name}")
           end
           raise "copy_resources #{spec_source_dir} no exist " unless File.exist?(spec_source_dir)
 
@@ -365,15 +356,14 @@ module CBin
 
       def framework
         @framework ||= begin
-          framework = Framework.new(@spec.name, @platform.name.to_s)
+          framework = Framework.new(treated_framework_name, @platform.name.to_s)
           framework.make
           framework
         end
       end
 
-      def framework_name
-        framework_name = @spec.name.sub('-', '_')
-        framework_name
+      def treated_framework_name
+        CBin::Config::Builder.instance.treated_framework_name(@spec)
       end
 
     end

@@ -57,13 +57,21 @@ module CBin
                      end
       end
 
+      # 处理后的framework文件名称
+      def treated_framework_name(spec)
+        treated_framework_name = spec.name.sub('-', '_')
+        if !spec.module_name.nil?
+          treated_framework_name = spec.module_name
+        end
+        treated_framework_name
+      end
 
       def framework_name(spec)
-        "#{spec.name}.framework"
+        "#{treated_framework_name(spec)}.framework"
       end
 
       def framework_name_version(spec)
-        "#{spec.name}.framework_#{spec.version}"
+        "#{treated_framework_name(spec)}.framework_#{spec.version}"
       end
 
       def framework_zip_file(spec)

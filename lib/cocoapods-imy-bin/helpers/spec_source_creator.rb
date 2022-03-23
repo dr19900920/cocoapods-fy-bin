@@ -133,7 +133,8 @@ module CBin
         # license | resource_bundles | vendored_libraries
 
         # Project Linkin
-        @spec.vendored_frameworks = "#{code_spec.root.name}.framework"
+        framework_name = CBin::Config::Builder.instance.treated_framework_name(@spec)
+        @spec.vendored_frameworks = "#{framework_name}.framework"
 
         # Resources
         extnames = []
