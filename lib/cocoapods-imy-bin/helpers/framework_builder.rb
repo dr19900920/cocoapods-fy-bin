@@ -58,13 +58,14 @@ module CBin
       private
 
       def cp_to_source_dir
-        target_dir = File.join(CBin::Config::Builder.instance.zip_dir,treated_framework_name)
+        framework_name = "#{treated_framework_name}.framework"
+        target_dir = File.join(CBin::Config::Builder.instance.zip_dir,framework_name)
         FileUtils.rm_rf(target_dir) if File.exist?(target_dir)
 
         zip_dir = CBin::Config::Builder.instance.zip_dir
         FileUtils.mkdir_p(zip_dir) unless File.exist?(zip_dir)
 
-        `cp -fa #{@platform}/#{treated_framework_name} #{target_dir}`
+        `cp -fa #{@platform}/#{framework_name} #{target_dir}`
       end
 
       #模拟器，目前只支持 debug x86-64
