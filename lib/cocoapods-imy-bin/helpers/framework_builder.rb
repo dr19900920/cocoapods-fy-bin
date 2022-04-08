@@ -276,6 +276,13 @@ module CBin
         swift_module_map_dir = "./build-#{arch}/#{treated_framework_name}.framework/Modules/#{treated_framework_name}.swiftmodule"
         if File.exist?(swift_module_map_dir)
           `ditto #{swift_module_map_dir} #{framework.swift_module_path}`
+          # 解决module与class名称冲突问题
+          swift_module_dir_path = File.expand_path(framework.swift_module_path)
+          puts swift_module_dir_path
+          Dir.chdir(swift_module_dir_path) {
+            `find . -name "*.swiftinterface" -exec sed -i -e 's/#{treated_framework_name}\\.//g' {} \\;`
+            `find . -name "*.swiftinterface-e" | xargs rm -rf`
+          }
         end
       end
 
