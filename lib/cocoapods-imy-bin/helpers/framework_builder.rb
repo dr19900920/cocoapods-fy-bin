@@ -278,10 +278,23 @@ module CBin
           `ditto #{swift_module_map_dir} #{framework.swift_module_path}`
           # 解决module与class名称冲突问题
           swift_module_dir_path = File.expand_path(framework.swift_module_path)
-          puts swift_module_dir_path
+
+          exclude_frameworks = ["Foundation","Swift","UIKit","_Concurrency"]
           Dir.chdir(swift_module_dir_path) {
-            `find . -name "*.swiftinterface" -exec sed -i -e 's/#{treated_framework_name}\\.//g' {} \\;`
-            `find . -name "*.swiftinterface-e" | xargs rm -rf`
+            arr = IO.readlines("arm64.swiftinterface")
+            arr.map { |item|
+              if item.include?("import ")
+                items = item.split(" ")
+                item_last = items.last
+                if !exclude_frameworks.include?(item_last)
+                  `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\.#{item_last}/#{item_last}ACE\\.#{item_last}BDF/g' {} \\;`
+                  `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\./#{item_last}ACE\\./g' {} \\;`
+                  `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}ACE\\.//g' {} \\;`
+                  `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}BDF/#{item_last}/g' {} \\;`
+                  `find . -name "*.swiftinterface-e" | xargs rm -rf`
+                end
+              end
+            }
           }
         end
       end
