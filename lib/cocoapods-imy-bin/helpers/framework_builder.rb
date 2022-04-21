@@ -287,7 +287,7 @@ module CBin
                 items = item.split(" ")
                 item_last = items.last
                 if !exclude_frameworks.include?(item_last)
-                  `find . -name "*.swiftinterface" -exec sed -i -e 's/Moya\\.Method/MoyaBDF\\.Method/g' {} \\;`
+                  `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\.Method/#{item_last}BDF\\.Method/g' {} \\;`
                   `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\.#{item_last}/#{item_last}ACE\\.#{item_last}BDF/g' {} \\;`
                   `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\./#{item_last}ACE\\./g' {} \\;`
                   `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}ACE\\.//g' {} \\;`
