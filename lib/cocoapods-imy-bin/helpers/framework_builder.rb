@@ -45,7 +45,7 @@ module CBin
           # build_sim_libraries(defines)
           output = framework.fwk_path + Pathname.new(treated_framework_name)
           build_static_library_for_ios(output)
-
+          copy_private_headers
           copy_headers
           copy_license
           copy_resources
@@ -218,6 +218,23 @@ module CBin
           EOF
 
           Process.exit
+        end
+      end
+
+      def copy_private_headers
+        private_headers = Array.new
+        arch = ios_architectures[0]
+        spec_private_header_dir = "./build-#{arch}/#{treated_framework_name}.framework/PrivateHeaders"
+        raise "copy_private_headers #{spec_private_header_dir} no exist " unless File.exist?(spec_private_header_dir)
+        Dir.chdir(spec_private_header_dir) do
+          headers = Dir.glob('*.h')
+          headers.each do |h|
+            private_headers << Pathname.new(File.join(Dir.pwd,h))
+          end
+        end
+
+        private_headers.each do |h|
+          `ditto #{h} #{framework.private_headers_path}/#{h.basename}`
         end
       end
 

@@ -3,6 +3,7 @@
 module CBin
   class Framework
     attr_reader :headers_path
+    attr_reader :private_headers_path
     attr_reader :module_map_path
     attr_reader :resources_path
     attr_reader :root_path
@@ -74,7 +75,9 @@ module CBin
     def make_headers
       # @headers_path = @versions_path + Pathname.new('Headers')
       @headers_path = @fwk_path + Pathname.new('Headers')
+      @private_headers_path = @fwk_path + Pathname.new('PrivateHeaders')
       @headers_path.mkpath unless @headers_path.exist?
+      @private_headers_path.mkpath  unless @private_headers_path.exist?
     end
 
     def make_resources
