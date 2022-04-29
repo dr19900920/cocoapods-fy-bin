@@ -225,16 +225,18 @@ module CBin
         private_headers = Array.new
         arch = ios_architectures[0]
         spec_private_header_dir = "./build-#{arch}/#{treated_framework_name}.framework/PrivateHeaders"
-        raise "copy_private_headers #{spec_private_header_dir} no exist " unless File.exist?(spec_private_header_dir)
-        Dir.chdir(spec_private_header_dir) do
-          headers = Dir.glob('*.h')
-          headers.each do |h|
-            private_headers << Pathname.new(File.join(Dir.pwd,h))
+        if File.exist?(spec_private_header_dir) do
+          Dir.chdir(spec_private_header_dir) do
+            headers = Dir.glob('*.h')
+            headers.each do |h|
+              private_headers << Pathname.new(File.join(Dir.pwd,h))
+            end
+          end
+
+          private_headers.each do |h|
+            `ditto #{h} #{framework.private_headers_path}/#{h.basename}`
           end
         end
-
-        private_headers.each do |h|
-          `ditto #{h} #{framework.private_headers_path}/#{h.basename}`
         end
       end
 
@@ -243,21 +245,21 @@ module CBin
         public_headers = Array.new
         arch = ios_architectures[0]
         spec_header_dir = "./build-#{arch}/#{treated_framework_name}.framework/Headers"
-        raise "copy_headers #{spec_header_dir} no exist " unless File.exist?(spec_header_dir)
-        Dir.chdir(spec_header_dir) do
-          headers = Dir.glob('*.h')
-          headers.each do |h|
-            public_headers << Pathname.new(File.join(Dir.pwd,h))
+        if File.exist?(spec_header_dir)
+          Dir.chdir(spec_header_dir) do
+            headers = Dir.glob('*.h')
+            headers.each do |h|
+              public_headers << Pathname.new(File.join(Dir.pwd,h))
+            end
+          end
+          # end
+
+          # UI.message "Copying public headers #{public_headers.map(&:basename).map(&:to_s)}"
+
+          public_headers.each do |h|
+            `ditto #{h} #{framework.headers_path}/#{h.basename}`
           end
         end
-        # end
-
-        # UI.message "Copying public headers #{public_headers.map(&:basename).map(&:to_s)}"
-
-        public_headers.each do |h|
-          `ditto #{h} #{framework.headers_path}/#{h.basename}`
-        end
-
         # If custom 'module_map' is specified add it to the framework distribution
         # otherwise check if a header exists that is equal to 'spec.name', if so
         # create a default 'module_map' one using it.
