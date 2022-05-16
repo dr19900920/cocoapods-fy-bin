@@ -225,7 +225,7 @@ module CBin
         private_headers = Array.new
         arch = ios_architectures[0]
         spec_private_header_dir = "./build-#{arch}/#{treated_framework_name}.framework/PrivateHeaders"
-        if File.exist?(spec_private_header_dir) do
+        if File.exist?(spec_private_header_dir)
           Dir.chdir(spec_private_header_dir) do
             headers = Dir.glob('*.h')
             headers.each do |h|
@@ -236,7 +236,6 @@ module CBin
           private_headers.each do |h|
             `ditto #{h} #{framework.private_headers_path}/#{h.basename}`
           end
-        end
         end
       end
 

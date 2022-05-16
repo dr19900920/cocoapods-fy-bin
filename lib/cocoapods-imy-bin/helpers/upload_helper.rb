@@ -42,6 +42,13 @@ module CBin
         spec_creator.filename
       end
 
+      def curl_del_zip
+        print <<EOF
+          删除已上传的二进制文件
+         curl -v -X DELETE "#{CBin.config.binary_upload_url}/#{@spec.name}/#{@spec.version}"
+EOF
+        `curl -v -X DELETE "#{CBin.config.binary_upload_url}/#{@spec.name}/#{@spec.version}"`
+      end
       #推送二进制
       # curl http://ci.xxx:9192/frameworks -F "name=IMYFoundation" -F "version=7.7.4.2" -F "annotate=IMYFoundation_7.7.4.2_log" -F "file=@bin_zip/bin_IMYFoundation_7.7.4.2.zip"
       def curl_zip
