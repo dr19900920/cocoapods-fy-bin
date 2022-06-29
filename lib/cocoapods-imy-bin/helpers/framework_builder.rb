@@ -176,7 +176,7 @@ module CBin
           # archs = %w[arm64 armv7 armv7s]
           archs.map do |arch|
             # -fembed-bitcode支持bitcode BUILD_LIBRARY_FOR_DISTRIBUTION=YES 构建向后兼容的framework
-            xcodebuild(defines, "ARCHS=\'#{arch}\' OTHER_CFLAGS=\'-fembed-bitcode -Qunused-arguments\' BUILD_LIBRARY_FOR_DISTRIBUTION=YES","build-#{arch}",@build_model)
+            xcodebuild(defines, "ARCHS=\'#{arch}\' OTHER_CFLAGS=\'-fembed-bitcode -Qunused-arguments\' DEBUG_INFORMATION_FORMAT=\'dwarf-with-dsym\' BUILD_LIBRARY_FOR_DISTRIBUTION=YES","build-#{arch}",@build_model)
           end
         # else
           # xcodebuild(defines,options)
