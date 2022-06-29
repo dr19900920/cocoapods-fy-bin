@@ -22,6 +22,7 @@ module CBin
       end
 
       def upload
+        # curl_del_zip
         Dir.chdir(CBin::Config::Builder.instance.root_dir) do
           # 创建binary-template.podsepc
           # 上传二进制文件

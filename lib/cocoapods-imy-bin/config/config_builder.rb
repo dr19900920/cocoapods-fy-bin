@@ -70,6 +70,10 @@ module CBin
         "#{treated_framework_name(spec)}.framework"
       end
 
+      def framework_dsym_name(spec)
+        "#{treated_framework_name(spec)}.framework.dSYM"
+      end
+
       def framework_name_version(spec)
         "#{treated_framework_name(spec)}.framework_#{spec.version}"
       end

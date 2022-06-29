@@ -50,6 +50,7 @@ module CBin
           copy_license
           copy_resources
           copy_info_plist
+          copy_dsym
           cp_to_source_dir
         end
         framework
@@ -65,7 +66,7 @@ module CBin
         zip_dir = CBin::Config::Builder.instance.zip_dir
         FileUtils.mkdir_p(zip_dir) unless File.exist?(zip_dir)
 
-        `cp -fa #{@platform}/#{framework_name} #{target_dir}`
+        `cp -fa #{@platform}/* #{target_dir}`
       end
 
       #模拟器，目前只支持 debug x86-64
@@ -385,6 +386,14 @@ module CBin
           end
           UI.message "Copying resources #{escape_resource}"
           `cp -rp #{escape_resource.join(' ')} #{framework.resources_path}`
+        end
+      end
+
+      def copy_dsym
+        arch = ios_architectures[0]
+        dsym_file = "./build-#{arch}/#{treated_framework_name}.framework.dSYM"
+        if File.exist?(dsym_file)
+          `ditto "./build-#{arch}/#{treated_framework_name}.framework.dSYM" "./ios/#{treated_framework_name}.framework.dSYM"`
         end
       end
 

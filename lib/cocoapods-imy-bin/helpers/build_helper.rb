@@ -84,7 +84,7 @@ module CBin
           end
 
           UI.puts "Compressing #{framework_name} into #{output_name}"
-          `zip --symlinks -r #{output_name} #{framework_name}`
+          `zip --symlinks -r #{output_name} ./*`
         end
       end
 
@@ -117,6 +117,10 @@ module CBin
 
       def framework_name
         CBin::Config::Builder.instance.framework_name(@spec)
+      end
+
+      def framework_dsym_name
+        CBin::Config::Builder.instance.framework_dsym_name(@spec)
       end
 
       def framework_name_zip
