@@ -65,8 +65,7 @@ module CBin
 
         zip_dir = CBin::Config::Builder.instance.zip_dir
         FileUtils.mkdir_p(zip_dir) unless File.exist?(zip_dir)
-        puts target_dir
-        `cp -fa #{@platform}/* #{zip_dir}`
+        `cp -fa #{@platform}/* #{target_dir}`
       end
 
       #模拟器，目前只支持 debug x86-64
