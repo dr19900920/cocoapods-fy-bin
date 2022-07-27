@@ -1,6 +1,6 @@
 SKIP_UNRELEASED_VERSIONS = false
 
-# Specify your gem's dependencies in cocoapods-imy-bin.gemspec
+# Specify your gem's dependencies in cocoapods-fy-bin.gemspec
 
 
 def cp_gem(name, repo_name, branch = 'master', path: false)
@@ -19,11 +19,11 @@ source 'https://rubygems.org'
 
 group :development do
 
-  cp_gem 'cocoapods',                'cocoapods',path: 'CocoaPods'
-  cp_gem 'xcodeproj',                'xcodeproj',path: 'Xcodeproj'
-  cp_gem 'cocoapods-imy-bin',                'cocoapods-imy-bin',path: 'cocoapods-imy-bin'
+  cp_gem 'cocoapods',                'cocoapods', path: 'CocoaPods'
+  cp_gem 'xcodeproj',                'xcodeproj', path: 'Xcodeproj'
+  cp_gem 'cocoapods-fy-bin',                'cocoapods-fy-bin', path: 'cocoapods-fy-bin'
 
-  gem 'cocoapods-generate', '1.6.0'
+  gem 'cocoapods-generate', '~>2.0.1'
   gem 'mocha'
   gem 'bacon'
   gem 'mocha-on-bacon'
