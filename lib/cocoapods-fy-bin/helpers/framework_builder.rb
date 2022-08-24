@@ -299,21 +299,26 @@ module CBin
 
           exclude_frameworks = ["Foundation","Swift","UIKit","_Concurrency"]
           Dir.chdir(swift_module_dir_path) {
-            arr = IO.readlines("arm64.swiftinterface")
-            arr.map { |item|
-              if item.include?("import ")
-                items = item.split(" ")
-                item_last = items.last
-                if !exclude_frameworks.include?(item_last)
-                  `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\.Method/#{item_last}BDF\\.Method/g' {} \\;`
-                  `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\.#{item_last}/#{item_last}ACE\\.#{item_last}BDF/g' {} \\;`
-                  `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\./#{item_last}ACE\\./g' {} \\;`
-                  `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}ACE\\.//g' {} \\;`
-                  `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}BDF/#{item_last}/g' {} \\;`
-                  `find . -name "*.swiftinterface-e" | xargs rm -rf`
+            if File.exist?("./arm64.swiftinterface")
+              arr = IO.readlines("arm64.swiftinterface")
+              arr.map { |item|
+                if item.include?("import ")
+                  items = item.split(" ")
+                  item_last = items.last
+                  if !exclude_frameworks.include?(item_last)
+                    `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\.Method/#{item_last}BDF\\.Method/g' {} \\;`
+                    `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\.#{item_last}/#{item_last}ACE\\.#{item_last}BDF/g' {} \\;`
+                    `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\./#{item_last}ACE\\./g' {} \\;`
+                    `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}ACE\\.//g' {} \\;`
+                    `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}BDF/#{item_last}/g' {} \\;`
+                    `find . -name "*.swiftinterface-e" | xargs rm -rf`
+                  end
                 end
-              end
-            }
+              }
+            end
+            # if File.exist?("./arm64-apple-ios.swiftinterface")
+              # arr = IO.readlines("arm64-apple-ios.swiftinterface")
+            # end
           }
         end
       end

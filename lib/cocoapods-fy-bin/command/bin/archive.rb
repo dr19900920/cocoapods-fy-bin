@@ -45,6 +45,7 @@ module Pod
           UI.warn "====== cocoapods-fy-bin #{CBin::VERSION} 版本 ======== \n "
           UI.warn "======  #{@env} 环境 ======== \n "
 
+          @podspec = argv.shift_argument
           @code_dependencies = argv.flag?('code-dependencies')
           @framework_output = argv.flag?('framework-output', false )
           @clean = argv.flag?('no-clean', false)
