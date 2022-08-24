@@ -21,7 +21,8 @@ module Pod
               ['--all-make', '对该组件的依赖库，全部制作为二进制组件'],
               ['--configuration', 'Build the specified configuration (e.g. Release ). Defaults to Debug'],
               ['--env', "该组件上传的环境 %w[dev debug_iphoneos release_iphoneos]"],
-              ['--archs', "需要二进制组件的架构"]
+              ['--archs', "需要二进制组件的架构"],
+              ['--spec', "指定spec文件"]
           ].concat(Pod::Command::Gen.options).concat(super).uniq
         end
 
@@ -29,8 +30,8 @@ module Pod
 
           @env = argv.option('env') || 'dev'
           CBin.config.set_configuration_env(@env)
-
-          @podspec = argv.shift_argument || find_podspec
+          @podspec = argv.shift_argument || argv.flag?('spec') || find_podspec
+          puts @podspec
           @specification = Specification.from_file(@podspec)
 
           @code_dependencies = argv.flag?('code-dependencies')
