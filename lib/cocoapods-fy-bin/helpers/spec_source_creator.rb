@@ -99,6 +99,7 @@ module CBin
         # spec_hash.delete('vendored_libraries')
         # libraries 只能假设为动态库不做处理了，如果有例外，需要开发者自行处理
         spec_hash.delete('vendored_libraries')
+        spec_hash.delete('vendored_library')
 
         # vendored_libraries = Array(vendored_libraries).reject { |l| l.end_with?('.a') }
         # if vendored_libraries.any?
