@@ -167,7 +167,7 @@ module CBin
 
       def compile
         defines = "GCC_PREPROCESSOR_DEFINITIONS='$(inherited)'"
-        defines += ' '
+        defines += "  SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited)' "
         defines += @spec.consumer(@platform).compiler_flags.join(' ')
 
         options = ios_build_options
@@ -203,6 +203,7 @@ module CBin
 
         unless File.exist?("Pods.xcodeproj") #cocoapods-generate v2.0.0
           command = "xcodebuild #{defines} #{args} CONFIGURATION_BUILD_DIR=#{File.join(File.expand_path("..", build_dir), File.basename(build_dir))} clean build -configuration #{build_model} -target #{target_name} -project ./Pods/Pods.xcodeproj 2>&1"
+          puts command
         else
           command = "xcodebuild #{defines} #{args} CONFIGURATION_BUILD_DIR=#{build_dir} clean build -configuration #{build_model} -target #{target_name} -project ./Pods.xcodeproj 2>&1"
         end
@@ -316,9 +317,23 @@ module CBin
                 end
               }
             end
-            # if File.exist?("./arm64-apple-ios.swiftinterface")
-              # arr = IO.readlines("arm64-apple-ios.swiftinterface")
-            # end
+            if File.exist?("./arm64-apple-ios.swiftinterface")
+              arr = IO.readlines("arm64-apple-ios.swiftinterface")
+              arr.map { |item|
+                if item.include?("import ")
+                  items = item.split(" ")
+                  item_last = items.last
+                  if !exclude_frameworks.include?(item_last)
+                    `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\.Method/#{item_last}BDF\\.Method/g' {} \\;`
+                    `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\.#{item_last}/#{item_last}ACE\\.#{item_last}BDF/g' {} \\;`
+                    `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}\\./#{item_last}ACE\\./g' {} \\;`
+                    `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}ACE\\.//g' {} \\;`
+                    `find . -name "*.swiftinterface" -exec sed -i -e 's/#{item_last}BDF/#{item_last}/g' {} \\;`
+                    `find . -name "*.swiftinterface-e" | xargs rm -rf`
+                  end
+                end
+              }
+            end
           }
         end
       end
