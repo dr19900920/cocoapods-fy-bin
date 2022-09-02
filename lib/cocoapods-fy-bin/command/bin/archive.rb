@@ -30,7 +30,7 @@ module Pod
               ['--framework-output', '输出framework文件'],
               ['--no-zip', '不压缩静态库 为 zip'],
               ['--configuration', 'Build the specified configuration (e.g. Debug). Defaults to Release'],
-              ['--env', "该组件上传的环境 %w[dev debug_iphoneos release_iphoneos]"],
+              ['--env', "该组件上传的环境 %w[debug release]"],
               ['--archs', "需要二进制组件的架构"]
           ].concat(Pod::Command::Gen.options).concat(super).uniq
         end
@@ -40,7 +40,7 @@ module Pod
         ]
 
         def initialize(argv)
-          @env = argv.option('env') || 'dev'
+          @env = argv.option('env') || 'debug'
           CBin.config.set_configuration_env(@env)
           UI.warn "====== cocoapods-fy-bin #{CBin::VERSION} 版本 ======== \n "
           UI.warn "======  #{@env} 环境 ======== \n "

@@ -28,11 +28,10 @@ module Pod
         set_internal_hash_value(USE_SOURCE_PODS, hash_pods_use_source)
       end
 
-      # 0 dev
-      # 1 debug_iphoneos
-      # 2 release_iphoneos
+      # 1 debug
+      # 2 release
       # 需要在podfile_env 先定义  CONFIGURATION_ENV
-      def set_configuration_env(env = "dev")
+      def set_configuration_env(env = "debug")
         set_internal_hash_value(CONFIGURATION_ENV, env)
       end
     end

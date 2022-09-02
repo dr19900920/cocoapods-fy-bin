@@ -19,10 +19,11 @@ module CBin
         @spec = spec
         @code_dependencies = code_dependencies
         @sources = sources
+        @remote_helper = RemoteHelper.new()
       end
 
       def upload
-        # curl_del_zip
+        del_zip
         Dir.chdir(CBin::Config::Builder.instance.root_dir) do
           # 创建binary-template.podsepc
           # 上传二进制文件
@@ -43,15 +44,21 @@ module CBin
         spec_creator.filename
       end
 
-      def curl_del_zip
+      # 如果存在相同的版本号先删除组件二进制
+      def del_zip
         print <<EOF
-          删除已上传的二进制文件
-         curl -v -X DELETE "#{CBin.config.binary_upload_url}/#{@spec.name}/#{@spec.version}"
+          删除已上传的二进制文件 #{@spec.name} #{@spec.version} #{CBin.config.configuration_env}
 EOF
-        `curl -v -X DELETE "#{CBin.config.binary_upload_url}/#{@spec.name}/#{@spec.version}"`
+        result = @remote_helper.exist?(@spec.name, @spec.version, CBin.config.configuration_env)
+        if result
+          print <<EOF
+          删除中
+EOF
+          @remote_helper.delete(@spec.name, @spec.version, CBin.config.configuration_env)
+        end
       end
+
       #推送二进制
-      # curl http://ci.xxx:9192/frameworks -F "name=IMYFoundation" -F "version=7.7.4.2" -F "annotate=IMYFoundation_7.7.4.2_log" -F "file=@bin_zip/bin_IMYFoundation_7.7.4.2.zip"
       def curl_zip
         zip_file = "#{CBin::Config::Builder.instance.library_file(@spec)}.zip"
         res = File.exist?(zip_file)
@@ -61,10 +68,9 @@ EOF
         end
         if res
           print <<EOF
-          上传二进制文件
-         curl #{CBin.config.binary_upload_url} -F "name=#{@spec.name}" -F "version=#{@spec.version}" -F "annotate=#{@spec.name}_#{@spec.version}_log" -F "file=@#{zip_file}"
+          上传二进制文件 #{@spec.name} #{@spec.version} #{CBin.config.configuration_env}
 EOF
-          `curl #{CBin.config.binary_upload_url} -F "name=#{@spec.name}" -F "version=#{@spec.version}" -F "annotate=#{@spec.name}_#{@spec.version}_log" -F "file=@#{zip_file}"` if res
+          remote.upload(@module_name, @version, mode.downcase, zip_file) if res
         end
 
         res

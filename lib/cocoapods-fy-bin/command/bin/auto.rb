@@ -20,7 +20,7 @@ module Pod
               ['--no-zip', '不压缩静态 framework 为 zip'],
               ['--all-make', '对该组件的依赖库，全部制作为二进制组件'],
               ['--configuration', 'Build the specified configuration (e.g. Release ). Defaults to Debug'],
-              ['--env', "该组件上传的环境 %w[dev debug_iphoneos release_iphoneos]"],
+              ['--env', "该组件上传的环境 %w[debug release]"],
               ['--archs', "需要二进制组件的架构"]
           ].concat(Pod::Command::Gen.options).concat(super).uniq
         end
