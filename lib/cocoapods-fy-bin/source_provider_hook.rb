@@ -8,8 +8,8 @@ Pod::HooksManager.register('cocoapods-fy-bin', :pre_install) do |_context, _|
   # pod bin repo update 更新二进制私有源
   Pod::Command::Bin::Repo::Update.new(CLAide::ARGV.new([])).run
 
-  # 有插件/本地库 且是dev环境下，默认进入源码白名单  过滤 archive命令
-  if _context.podfile.plugins.keys.include?('cocoapods-fy-bin') && _context.podfile.configuration_env == 'dev'
+  # 有插件/本地库 且是debug环境下，默认进入源码白名单  过滤 archive命令
+  if _context.podfile.plugins.keys.include?('cocoapods-fy-bin') && _context.podfile.configuration_env == 'debug'
     dependencies = _context.podfile.dependencies
     dependencies.each do |d|
       # 组件存在external_source，并且external_source有值 并且external_source path不为空 且不为archive状态时 设置组件加载路径

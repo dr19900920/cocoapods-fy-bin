@@ -27,7 +27,7 @@ module Pod
 
         def initialize(argv)
 
-          @env = argv.option('env') || 'dev'
+          @env = argv.option('env') || 'release'
           CBin.config.set_configuration_env(@env)
           @podspec = argv.shift_argument
           @specification = Specification.from_file(@podspec)
