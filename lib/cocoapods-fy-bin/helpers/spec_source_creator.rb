@@ -122,7 +122,6 @@ module CBin
         @spec.vendored_libraries = binary_vendored_libraries
         @spec.resources = binary_resources if @spec.attributes_hash.keys.include?("resources")
         @spec.description = <<-EOF
-         「   converted automatically by plugin cocoapods-fy-bin @厦门美柚 - slj    」
           #{@spec.description}
         EOF
         @spec
