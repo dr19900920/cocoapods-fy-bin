@@ -79,7 +79,8 @@ module CBin
       end
 
       def framework_zip_file(spec)
-        File.join(zip_dir_name, framework_name_version(spec))
+        # File.join(zip_dir_name, framework_name_version(spec))
+        File.join(zip_dir_name, "file.zip")
       end
 
       def framework_file(spec)

@@ -9,6 +9,7 @@ require 'cocoapods-fy-bin/helpers/framework_builder'
 require 'cocoapods-fy-bin/helpers/library_builder'
 require 'cocoapods-fy-bin/helpers/sources_helper'
 require 'cocoapods-fy-bin/command/bin/spec/push'
+require 'cocoapods-fy-bin/helpers/remote_helper'
 
 module CBin
   class Upload
@@ -19,7 +20,7 @@ module CBin
         @spec = spec
         @code_dependencies = code_dependencies
         @sources = sources
-        @remote_helper = RemoteHelper.new()
+        @remote_helper = CBin::Remote::Helper.new
       end
 
       def upload
@@ -60,17 +61,13 @@ EOF
 
       #推送二进制
       def curl_zip
-        zip_file = "#{CBin::Config::Builder.instance.library_file(@spec)}.zip"
+        zip_file = CBin::Config::Builder.instance.framework_zip_file(@spec)
         res = File.exist?(zip_file)
-        unless res
-          zip_file = CBin::Config::Builder.instance.framework_zip_file(@spec) + ".zip"
-          res = File.exist?(zip_file)
-        end
         if res
           print <<EOF
           上传二进制文件 #{@spec.name} #{@spec.version} #{CBin.config.configuration_env}
 EOF
-          remote.upload(@module_name, @version, mode.downcase, zip_file) if res
+          @remote_helper.upload(@spec.name, @spec.version, CBin.config.configuration_env, zip_file) if res
         end
 
         res

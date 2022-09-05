@@ -187,7 +187,7 @@ module CBin
 
 
       def binary_source
-        { http: format(CBin.config.binary_download_url, code_spec.root.name, code_spec.version), type: CBin.config.download_file_type }
+        { http: "#{CBin.config.binary_download_url}/frameworks/download/#{code_spec.root.name}/#{code_spec.version}/#{CBin.config.configuration_env}/file.zip", type: CBin.config.download_file_type }
       end
 
       def code_spec_consumer(_platform = :ios)

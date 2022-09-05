@@ -90,7 +90,7 @@ module CBin
 
       def zip_static_library
         Dir.chdir(zip_dir) do
-          output_library = "#{library_name}.zip"
+          output_library = "file.zip"
           unless File.exist?(library_name)
             raise Informative, "没有需要压缩的 library 文件：#{library_name}"
           end
@@ -111,7 +111,7 @@ module CBin
           FileUtils.rm_rf(framework_name) if @zip
           FileUtils.rm_rf(library_name)
           FileUtils.rm_rf(framework_name) unless @framework_output
-          FileUtils.rm_rf("#{framework_name}.zip") unless @framework_output
+          FileUtils.rm_rf("file.zip") unless @framework_output
         end
       end
 
@@ -124,7 +124,8 @@ module CBin
       end
 
       def framework_name_zip
-        CBin::Config::Builder.instance.framework_name_version(@spec) + ".zip"
+        # CBin::Config::Builder.instance.framework_name_version(@spec) + ".zip"
+        "file.zip"
       end
 
       def library_name
