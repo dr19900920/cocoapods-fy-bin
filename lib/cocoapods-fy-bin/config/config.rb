@@ -11,12 +11,13 @@ module CBin
 
     def template_hash
       {
-          'configuration_env' => { description: '编译环境', default: 'debug', selection: %w[debug release] },
+          'configuration_env' => { description: '编译环境', default: 'release', selection: %w[debug release] },
           'code_repo_url' => { description: '源码私有源 Git 地址', default: 'https://gitlab.fuyoukache.com/iosThird/swiftThird/FYSwiftSpecs.git' },
           'binary_repo_url' => { description: '二进制私有源 Git 地址', default: 'https://gitlab.fuyoukache.com/iosThird/swiftThird/fybinaryspecs.git' },
           'binary_download_url' => { description: '二进制下载主机地址，内部会依次传入组件名称、版本、打包模式', default: 'https://mobilepods.fuyoukache.com' },
           # 'binary_type' => { description: '二进制打包类型', default: 'framework', selection: %w[framework library] },
-          'download_file_type' => { description: '下载二进制文件类型', default: 'zip', selection: %w[zip tgz tar tbz txz dmg] }
+          'download_file_type' => { description: '下载二进制文件类型', default: 'zip', selection: %w[zip tgz tar tbz txz dmg] },
+          'clean_white_list' =>  { description: 'framework清空白名单, 二进制切换到源码会删除framework，避免这些库被删除重新下载', default: 'Bugly,LookinServer'}
       }
     end
 
@@ -37,12 +38,19 @@ module CBin
 
     def configuration_env
       #如果是debug 再去 podfile的配置文件中获取，确保是正确的， pod update时会用到
-      if @configuration_env == "debug" || @configuration_env == nil
-        if Pod::Config.instance.podfile
-          configuration_env ||= Pod::Config.instance.podfile.configuration_env
-        end
-        configuration_env ||= "debug"
-        @configuration_env = configuration_env
+      # if @configuration_env == "release" || @configuration_env == nil
+      #   if Pod::Config.instance.podfile
+      #     configuration_env ||= Pod::Config.instance.podfile.configuration_env
+      #   end
+      #   configuration_env ||= "release"
+      #   @configuration_env = configuration_env
+      # end
+      if @configuration_env == nil
+          if Pod::Config.instance.podfile
+            configuration_env ||= Pod::Config.instance.podfile.configuration_env
+          end
+          configuration_env ||= "release"
+          @configuration_env = configuration_env
       end
       @configuration_env
     end

@@ -3,11 +3,17 @@ require 'parallel'
 require 'cocoapods'
 require 'xcodeproj'
 require 'cocoapods-fy-bin/native/pod_source_installer'
+require 'cocoapods-fy-bin/config/config'
 
 module Pod
   class Installer
     attr_reader :removed_frameworks
-    attr_reader :clean_white_list
+
+    def clean_white_list
+      clean_white_string = CBin.config.clean_white_list
+      clean_white = clean_white_string.split(",")
+      clean_white
+    end
 
     def cache_descriptors
       @cache_descriptors ||= begin
@@ -39,7 +45,6 @@ module Pod
 
     # 清除本地资源 /Users/dengrui/Library/Caches/CocoaPods/Pods/Release/
     def clean_pod_cache
-      clean_white_list = ['Bugly', 'LookinServer']
       podfile = Pod::Config.instance.podfile
       root_specs.sort_by(&:name).each do |spec|
         descriptors = cache_descriptors[spec.root.name]

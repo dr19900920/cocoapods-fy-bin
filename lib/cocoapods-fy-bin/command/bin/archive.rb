@@ -40,7 +40,7 @@ module Pod
         ]
 
         def initialize(argv)
-          @env = argv.option('env') || 'debug'
+          @env = argv.option('env') || 'release'
           CBin.config.set_configuration_env(@env)
           UI.warn "====== cocoapods-fy-bin #{CBin::VERSION} 版本 ======== \n "
           UI.warn "======  #{@env} 环境 ======== \n "
