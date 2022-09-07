@@ -10,7 +10,7 @@ module CBin
     class Builder
       include Pod
 #Debug下还待完成
-      def initialize(spec, file_accessor, platform, source_dir, archs, pre_build_shell, isRootSpec = true, build_model="Debug")
+      def initialize(spec, file_accessor, platform, source_dir, archs, pre_build_shell, toolchain, isRootSpec = true, build_model="Debug")
         @spec = spec
         @source_dir = source_dir
         @file_accessor = file_accessor
@@ -19,6 +19,7 @@ module CBin
         @isRootSpec = isRootSpec
         @archs = archs
         @pre_build_shell = pre_build_shell
+        @toolchain = toolchain
         #vendored_static_frameworks 只有 xx.framework  需要拼接为 xx.framework/xx by slj
         vendored_static_frameworks = file_accessor.vendored_static_frameworks.map do |framework|
           path = framework
@@ -171,7 +172,9 @@ module CBin
         defines = "GCC_PREPROCESSOR_DEFINITIONS='$(inherited)'"
         defines += "  SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited)' "
         defines += @spec.consumer(@platform).compiler_flags.join(' ')
-
+        unless @toolchain.empty? then
+          defines += "-toolchain \"#{@toolchain}\""
+        end
         options = ios_build_options
         # if is_debug_model
           archs = ios_architectures

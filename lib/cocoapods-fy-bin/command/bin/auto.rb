@@ -22,7 +22,8 @@ module Pod
               ['--configuration', 'Build the specified configuration (e.g. Release ). Defaults to Debug'],
               ['--env', "该组件上传的环境 %w[debug release]"],
               ['--archs', "需要二进制组件的架构"],
-              ['--pre_build_shell', "xcodebuild前的脚本命令"]
+              ['--pre_build_shell', "xcodebuild前的脚本命令"],
+              ['--toolchain', "设置toolchain"]
           ].concat(Pod::Command::Gen.options).concat(super).uniq
         end
 
@@ -41,6 +42,7 @@ module Pod
           @verbose = argv.flag?('verbose', true)
           @archs = argv.flag?('archs', 'arm64')
           @pre_build_shell = argv.option('pre_build_shell') || ''
+          @toolchain = argv.option('toolchain') || ''
           @config = argv.option('configuration', 'Debug')
           @additional_args = argv.remainder!
 
@@ -130,6 +132,9 @@ module Pod
           end
           if @pre_build_shell
             argvs += ["--pre_build_shell=#{@pre_build_shell}"]
+          end
+          if @toolchain
+            argvs += ["--toolchain=#{@toolchain}"]
           end
           argvs += ["--configuration=#{@config}"]
           
