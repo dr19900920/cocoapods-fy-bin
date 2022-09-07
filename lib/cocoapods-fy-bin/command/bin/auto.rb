@@ -21,7 +21,8 @@ module Pod
               ['--all-make', '对该组件的依赖库，全部制作为二进制组件'],
               ['--configuration', 'Build the specified configuration (e.g. Release ). Defaults to Debug'],
               ['--env', "该组件上传的环境 %w[debug release]"],
-              ['--archs', "需要二进制组件的架构"]
+              ['--archs', "需要二进制组件的架构"],
+              ['--pre_build_shells', "xcodebuild前的脚本命令"]
           ].concat(Pod::Command::Gen.options).concat(super).uniq
         end
 
@@ -39,8 +40,10 @@ module Pod
           @all_make = argv.flag?('all-make', false)
           @verbose = argv.flag?('verbose', true)
           @archs = argv.flag?('archs', 'arm64')
+          @pre_build_shells = argv.flag?('pre_build_shells', '')
           @config = argv.option('configuration', 'Debug')
           @additional_args = argv.remainder!
+
 
           super
         end
@@ -124,6 +127,9 @@ module Pod
           end
           if @archs
             argvs += ["--archs=#{@archs}"]
+          end
+          if @pre_build_shells
+            argvs += ["--pre_build_shells=#{@pre_build_shells}"]
           end
           argvs += ["--configuration=#{@config}"]
           

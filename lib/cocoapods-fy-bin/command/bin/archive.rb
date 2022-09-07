@@ -31,7 +31,8 @@ module Pod
               ['--no-zip', '不压缩静态库 为 zip'],
               ['--configuration', 'Build the specified configuration (e.g. Debug). Defaults to Release'],
               ['--env', "该组件上传的环境 %w[debug release]"],
-              ['--archs', "需要二进制组件的架构"]
+              ['--archs', "需要二进制组件的架构"],
+              ['--pre_build_shells', "xcodebuild前的脚本命令"]
           ].concat(Pod::Command::Gen.options).concat(super).uniq
         end
 
@@ -54,6 +55,7 @@ module Pod
           @sources = argv.option('sources') || []
           @platform = Platform.new(:ios)
           @archs = argv.option('archs', 'armv7,arm64')
+          @pre_build_shells = argv.option('pre_build_shells', '')
           @config = argv.option('configuration', 'Release')
 
           @framework_path
@@ -88,6 +90,7 @@ module Pod
                                             @zip,
                                             @spec,
                                             @archs,
+                                            @pre_build_shells,
                                             CBin::Config::Builder.instance.white_pod_list.include?(@spec.name),
                                             @config)
           builder.build

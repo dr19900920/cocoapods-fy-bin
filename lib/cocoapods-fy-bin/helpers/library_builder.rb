@@ -11,13 +11,14 @@ module CBin
     class Builder
       include Pod
 
-      def initialize(spec, file_accessor, platform, source_dir, archs, framework_path)
+      def initialize(spec, file_accessor, platform, source_dir, archs, pre_build_shells, framework_path)
         @spec = spec
         @source_dir = source_dir
         @file_accessor = file_accessor
         @platform = platform
         @framework = framework_path
         @archs = archs
+        @pre_build_shells = pre_build_shells
         @source_files = "#{@source_dir}/#{library.name_path}"
         @source_zip_file = "#{@source_files}.zip"
       end

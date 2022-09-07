@@ -10,7 +10,7 @@ module CBin
     class Builder
       include Pod
 #Debug下还待完成
-      def initialize(spec, file_accessor, platform, source_dir, archs, isRootSpec = true, build_model="Debug")
+      def initialize(spec, file_accessor, platform, source_dir, archs, pre_build_shells, isRootSpec = true, build_model="Debug")
         @spec = spec
         @source_dir = source_dir
         @file_accessor = file_accessor
@@ -18,6 +18,7 @@ module CBin
         @build_model = build_model
         @isRootSpec = isRootSpec
         @archs = archs
+        @pre_build_commands = pre_build_shells
         #vendored_static_frameworks 只有 xx.framework  需要拼接为 xx.framework/xx by slj
         vendored_static_frameworks = file_accessor.vendored_static_frameworks.map do |framework|
           path = framework
@@ -74,6 +75,7 @@ module CBin
 
         # archs = %w[i386 x86_64]
         archs = ios_architectures_sim
+        pre_build_shell
         archs.map do |arch|
           xcodebuild(defines, "-sdk iphonesimulator ARCHS=\'#{arch}\' ", "build-#{arch}",@build_model)
         end
@@ -174,6 +176,7 @@ module CBin
         # if is_debug_model
           archs = ios_architectures
           # archs = %w[arm64 armv7 armv7s]
+          pre_build_shell
           archs.map do |arch|
             # -fembed-bitcode支持bitcode BUILD_LIBRARY_FOR_DISTRIBUTION=YES 构建向后兼容的framework
             xcodebuild(defines, "ARCHS=\'#{arch}\' OTHER_CFLAGS=\'-fembed-bitcode -Qunused-arguments\' DEBUG_INFORMATION_FORMAT=\'dwarf-with-dsym\' BUILD_LIBRARY_FOR_DISTRIBUTION=YES","build-#{arch}",@build_model)
@@ -199,6 +202,27 @@ module CBin
         end
       end
 
+      # 编译前需执行的的shell脚本
+      def pre_build_shell
+        command_args = @pre_build_commands.split(",")
+        command_args.each do |command_arg|
+          command = "sh #{command_arg}"
+          puts command
+          UI.message "command = #{command}"
+          output = `#{command}`.lines.to_a
+
+          if $CHILD_STATUS.exitstatus != 0
+            raise <<~EOF
+            Shell command failed: #{command}
+            Output:
+            #{output.map { |line| "    #{line}" }.join}
+            EOF
+
+            Process.exit
+          end
+        end
+      end
+
       def xcodebuild(defines = '', args = '', build_dir = 'build', build_model = 'Debug')
 
         unless File.exist?("Pods.xcodeproj") #cocoapods-generate v2.0.0
@@ -206,6 +230,7 @@ module CBin
           puts command
         else
           command = "xcodebuild #{defines} #{args} CONFIGURATION_BUILD_DIR=#{build_dir} clean build -configuration #{build_model} -target #{target_name} -project ./Pods.xcodeproj 2>&1"
+          puts command
         end
 
         UI.message "command = #{command}"
