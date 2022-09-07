@@ -21,6 +21,7 @@ module CBin
                      rootSpec,
                      archs,
                      pre_build_shell,
+                     suf_build_shell,
                      toolchain,
                      skip_archive = false,
                      build_model="Release")
@@ -31,6 +32,7 @@ module CBin
         @isRootSpec = rootSpec.name == spec.name
         @archs = archs
         @pre_build_shell = pre_build_shell
+        @suf_build_shell = suf_build_shell
         @toolchain = toolchain
         @skip_archive = skip_archive
         @framework_output = framework_output
@@ -60,7 +62,7 @@ module CBin
         source_dir = Dir.pwd
         file_accessor = Sandbox::FileAccessor.new(Pathname.new('.').expand_path, @spec.consumer(@platform))
         Dir.chdir(workspace_directory) do
-          builder = CBin::Framework::Builder.new(@spec, file_accessor, @platform, source_dir, @archs, @pre_build_shell, @toolchain, @isRootSpec, @build_model)
+          builder = CBin::Framework::Builder.new(@spec, file_accessor, @platform, source_dir, @archs, @pre_build_shell, @suf_build_shell, @toolchain, @isRootSpec, @build_model)
           @@build_defines = builder.build if @isRootSpec
           begin
             @framework_path = builder.lipo_build(@@build_defines) unless @skip_archive

@@ -10,7 +10,7 @@ module CBin
     class Builder
       include Pod
 #Debug下还待完成
-      def initialize(spec, file_accessor, platform, source_dir, archs, pre_build_shell, toolchain, isRootSpec = true, build_model="Debug")
+      def initialize(spec, file_accessor, platform, source_dir, archs, pre_build_shell, suf_build_shell, toolchain, isRootSpec = true, build_model="Debug")
         @spec = spec
         @source_dir = source_dir
         @file_accessor = file_accessor
@@ -19,6 +19,7 @@ module CBin
         @isRootSpec = isRootSpec
         @archs = archs
         @pre_build_shell = pre_build_shell
+        @suf_build_shell = suf_build_shell
         @toolchain = toolchain
         #vendored_static_frameworks 只有 xx.framework  需要拼接为 xx.framework/xx by slj
         vendored_static_frameworks = file_accessor.vendored_static_frameworks.map do |framework|
@@ -80,7 +81,7 @@ module CBin
         archs.map do |arch|
           xcodebuild(defines, "-sdk iphonesimulator ARCHS=\'#{arch}\' ", "build-#{arch}",@build_model)
         end
-
+        suf_build_command
       end
 
 
@@ -169,12 +170,13 @@ module CBin
       end
 
       def compile
-        defines = "GCC_PREPROCESSOR_DEFINITIONS='$(inherited)'"
-        defines += "  SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited)' "
-        defines += @spec.consumer(@platform).compiler_flags.join(' ')
+        defines = ""
         unless @toolchain.empty? then
           defines += "-toolchain \"#{@toolchain}\""
         end
+        defines += "GCC_PREPROCESSOR_DEFINITIONS='$(inherited)'"
+        defines += "  SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited)' "
+        defines += @spec.consumer(@platform).compiler_flags.join(' ')
         options = ios_build_options
         # if is_debug_model
           archs = ios_architectures
@@ -225,6 +227,26 @@ module CBin
         end
       end
 
+      # 编译后需执行的的shell脚本
+      def suf_build_command
+        unless @suf_build_shell.empty? then
+          command = "sh #{@suf_build_shell}"
+          puts command
+          UI.message "command = #{command}"
+          output = `#{command}`.lines.to_a
+
+          if $CHILD_STATUS.exitstatus != 0
+            raise <<~EOF
+            Shell command failed: #{command}
+            Output:
+            #{output.map { |line| "    #{line}" }.join}
+            EOF
+
+            Process.exit
+          end
+        end
+      end
+
       def xcodebuild(defines = '', args = '', build_dir = 'build', build_model = 'Debug')
 
         unless File.exist?("Pods.xcodeproj") #cocoapods-generate v2.0.0
@@ -239,6 +261,7 @@ module CBin
         output = `#{command}`.lines.to_a
 
         if $CHILD_STATUS.exitstatus != 0
+          suf_build_command
           raise <<~EOF
             Build command failed: #{command}
             Output:
