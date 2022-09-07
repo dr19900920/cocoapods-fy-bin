@@ -204,6 +204,7 @@ module CBin
 
       # 编译前需执行的的shell脚本
       def pre_build_command
+        unless @pre_build_shell.empty? then
           command = "sh #{@pre_build_shell}"
           puts command
           UI.message "command = #{command}"
@@ -218,6 +219,7 @@ module CBin
 
             Process.exit
           end
+        end
       end
 
       def xcodebuild(defines = '', args = '', build_dir = 'build', build_model = 'Debug')
