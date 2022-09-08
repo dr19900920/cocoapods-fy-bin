@@ -59,6 +59,7 @@ module Pod
           @archs = argv.option('archs', 'armv7,arm64')
           @pre_build_shell = argv.option('pre_build_shell') || ''
           @suf_build_shell = argv.option('suf_build_shell') || ''
+          @build_permission = argv.option('build_permission') || ''
           @toolchain = argv.option('toolchain') || ''
           @config = argv.option('configuration', 'Release')
 
@@ -96,6 +97,7 @@ module Pod
                                             @archs,
                                             @pre_build_shell,
                                             @suf_build_shell,
+                                            @build_permission,
                                             @toolchain,
                                             CBin::Config::Builder.instance.white_pod_list.include?(@spec.name),
                                             @config)

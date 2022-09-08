@@ -24,7 +24,8 @@ module Pod
               ['--archs', "需要二进制组件的架构"],
               ['--pre_build_shell', "xcodebuild前的脚本命令"],
               ['--suf_build_shell', "xcodebuild后的脚本命令"],
-              ['--toolchain', "设置toolchain"]
+              ['--toolchain', "设置toolchain"],
+              ['--build_permission', "xcodebuild权限"]
           ].concat(Pod::Command::Gen.options).concat(super).uniq
         end
 
@@ -44,6 +45,7 @@ module Pod
           @archs = argv.flag?('archs', 'arm64')
           @pre_build_shell = argv.option('pre_build_shell') || ''
           @suf_build_shell = argv.option('suf_build_shell') || ''
+          @build_permission = argv.option('build_permission') || ''
           @toolchain = argv.option('toolchain') || ''
           @config = argv.option('configuration', 'Debug')
           @additional_args = argv.remainder!
@@ -137,6 +139,9 @@ module Pod
           end
           if @suf_build_shell
             argvs += ["--suf_build_shell=#{@suf_build_shell}"]
+          end
+          if @build_permission
+            argvs += ["--build_permission=#{@build_permission}"]
           end
           if @toolchain
             argvs += ["--toolchain=#{@toolchain}"]
