@@ -1,12 +1,10 @@
 
-require 'cocoapods-fy-bin/command/bin/initHotKey'
 require 'cocoapods-fy-bin/command/bin/init'
 require 'cocoapods-fy-bin/command/bin/archive'
 require 'cocoapods-fy-bin/command/bin/auto'
 require 'cocoapods-fy-bin/command/bin/code'
 require 'cocoapods-fy-bin/command/bin/update'
 require 'cocoapods-fy-bin/command/bin/install'
-require 'cocoapods-fy-bin/command/bin/imy'
 
 require 'cocoapods-fy-bin/helpers'
 
