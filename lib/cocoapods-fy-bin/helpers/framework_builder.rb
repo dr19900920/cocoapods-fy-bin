@@ -178,7 +178,7 @@ module CBin
         defines += "GCC_PREPROCESSOR_DEFINITIONS='$(inherited)'"
         defines += "  SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited)' "
         defines += @spec.consumer(@platform).compiler_flags.join(' ')
-        options = ios_build_options
+        # options = ios_build_options
         # if is_debug_model
           archs = ios_architectures
           # archs = %w[arm64 armv7 armv7s]
