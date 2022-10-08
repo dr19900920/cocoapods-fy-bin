@@ -12,8 +12,8 @@ module CBin
     def template_hash
       {
           'configuration_env' => { description: '编译环境', default: 'release', selection: %w[debug release] },
-          'code_repo_url' => { description: '源码私有源 Git 地址', default: 'https://gitlab.fuyoukache.com/iosThird/swiftThird/FYSwiftSpecs.git' },
-          'binary_repo_url' => { description: '二进制私有源 Git 地址', default: 'https://gitlab.fuyoukache.com/iosThird/swiftThird/fybinaryspecs.git' },
+          'code_repo_url' => { description: '源码私有源 Git 地址', default: 'https://gitlab.fuyoukache.com/iosThird/FYSpecs.git' },
+          'binary_repo_url' => { description: '二进制私有源 Git 地址', default: 'https://gitlab.fuyoukache.com/iosThird/FYBinarySpecs.git' },
           'binary_download_url' => { description: '二进制下载主机地址，内部会依次传入组件名称、版本、打包模式', default: 'https://mobilepods.fuyoukache.com' },
           # 'binary_type' => { description: '二进制打包类型', default: 'framework', selection: %w[framework library] },
           'download_file_type' => { description: '下载二进制文件类型', default: 'zip', selection: %w[zip tgz tar tbz txz dmg] },
