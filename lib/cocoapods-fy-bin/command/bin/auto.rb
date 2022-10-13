@@ -103,7 +103,7 @@ module Pod
 
         def run_archive
           argvs = [
-              "--sources=#{sources_option(@code_dependencies, @sources)},https://github.com/CocoaPods/Specs.git,https://gitlab.fuyoukache.com/iosThird/FYSpecs.git,https://gitlab.fuyoukache.com/iosThird/swiftThird/FYSwiftSpecs.git",
+              "--sources=#{sources_option(@code_dependencies, @sources)},https://github.com/CocoaPods/Specs.git,https://gitlab.fuyoukache.com/iosThird/FYSpecs.git",
               @additional_args
           ]
 
