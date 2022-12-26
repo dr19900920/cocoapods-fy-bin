@@ -34,7 +34,7 @@ PATH
 PATH
   remote: .
   specs:
-    cocoapods-fy-bin (0.0.4)
+    cocoapods-fy-bin (0.2.3)
       cocoapods
       cocoapods-generate (~> 2.0.1)
       parallel

@@ -203,11 +203,11 @@ module CBin
       def target_name
         #区分多平台，如配置了多平台，会带上平台的名字
         # 如libwebp-iOS
-        if @spec.available_platforms.count > 1
-          "#{@spec.name}-#{Platform.string_name(@spec.consumer(@platform).platform_name)}"
-        else
+        # if @spec.available_platforms.count > 1
+        #   "#{@spec.name}-#{Platform.string_name(@spec.consumer(@platform).platform_name)}"
+        # else
           @spec.name
-        end
+        # end
       end
 
       # 编译前需执行的的shell脚本
